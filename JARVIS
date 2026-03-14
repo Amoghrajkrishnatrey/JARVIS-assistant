@@ -1,0 +1,163 @@
+import pyttsx3
+import datetime
+import requests
+import os
+from dotenv import load_dotenv
+import webbrowser
+
+load_dotenv()
+
+class SimpleJARVIS:
+    """
+    Simple JARVIS that speaks and accepts text commands only
+    """
+    
+    def __init__(self):
+        self.tts_engine = pyttsx3.init()
+        self.tts_engine.setProperty('rate', 150)
+        self.tts_engine.setProperty('volume', 1.0)
+        self.name = "JARVIS"
+        self.running = True
+    
+    def speak(self, text):
+        """Convert text to speech and print"""
+        print(f"\n🤖 {self.name}: {text}\n")
+        self.tts_engine.say(text)
+        self.tts_engine.runAndWait()
+    
+    def get_time(self):
+        """Get current time"""
+        current_time = datetime.datetime.now().strftime("%I:%M %p")
+        return f"The current time is {current_time}"
+    
+    def get_date(self):
+        """Get current date"""
+        current_date = datetime.datetime.now().strftime("%B %d, %Y")
+        return f"Today's date is {current_date}"
+    
+    def get_weather(self, city="London"):
+        """Get weather information"""
+        try:
+            api_key = os.getenv("OPENWEATHER_API_KEY", "")
+            if not api_key:
+                return "Weather API key not configured."
+            
+            url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=metric"
+            response = requests.get(url)
+            data = response.json()
+            
+            if response.status_code == 200:
+                temp = data['main']['temp']
+                condition = data['weather'][0]['description']
+                return f"In {city}, it's {temp} degrees Celsius with {condition}"
+            else:
+                return "Unable to fetch weather information."
+        except Exception as e:
+            return f"Error getting weather: {str(e)}"
+    
+    def search_web(self, query):
+        """Search the web"""
+        try:
+            self.speak(f"Searching the web for {query}")
+            webbrowser.open(f"https://www.google.com/search?q={query}")
+            return f"Opened search results for {query}"
+        except Exception as e:
+            return f"Error searching web: {str(e)}"
+    
+    def tell_joke(self):
+        """Tell a random joke"""
+        try:
+            response = requests.get("https://official-joke-api.appspot.com/random_joke")
+            if response.status_code == 200:
+                joke = response.json()
+                full_joke = f"{joke['setup']} {joke['punchline']}"
+                return full_joke
+            else:
+                return "I couldn't find a joke right now."
+        except Exception as e:
+            return "Error fetching joke"
+    
+    def calculate(self, expression):
+        """Perform calculations"""
+        try:
+            result = eval(expression)
+            return f"The answer is {result}"
+        except:
+            return "I couldn't calculate that. Please check your expression."
+    
+    def process_command(self, command):
+        """Process user commands"""
+        if not command:
+            return
+        
+        command = command.lower().strip()
+        if any(word in command for word in ["hello", "hi", "hey"]):
+            self.speak(f"Hello! I am {self.name}. How can I assist you?")
+        elif "time" in command:
+            self.speak(self.get_time())
+        elif "date" in command:
+            self.speak(self.get_date())
+        elif "weather" in command:
+            city = "London"
+            if "in" in command:
+                city = command.split("in")[-1].strip()
+            self.speak(self.get_weather(city))
+        elif "search" in command or "google" in command:
+            query = command.replace("search for", "").replace("search", "").replace("google", "").strip()
+            if query:
+                self.search_web(query)
+            else:
+                self.speak("Please tell me what to search for")
+        elif "joke" in command:
+            self.speak(self.tell_joke())
+        elif "calculate" in command or "math" in command:
+            expression = command.replace("calculate", "").replace("math", "").strip()
+            if expression:
+                self.speak(self.calculate(expression))
+            else:
+                self.speak("Please provide a math expression")
+        elif "shutdown" in command or "exit" in command or "goodbye" in command or "bye" in command:
+            self.speak("Goodbye sir. It was a pleasure serving you.")
+            self.running = False
+        elif "help" in command or "commands" in command:
+            help_text = """
+            Available commands:
+            - Hello: Greet JARVIS
+            - Time: Get current time
+            - Date: Get current date
+            - Weather: Get weather info
+            - Weather in [city]: Get weather for specific city
+            - Search for [query]: Search Google
+            - Tell me a joke: Get a random joke
+            - Calculate [expression]: Do math
+            - Help: Show this list
+            - Goodbye: Exit JARVIS
+            """
+            self.speak(help_text)
+        else:
+            self.speak(f"I'm not sure how to help with that. You said: {command}. Type 'help' for available commands.")
+    
+    def run(self):
+        """Main loop to run JARVIS"""
+        print("\n" + "="*60)
+        print("🤖 JARVIS AI ASSISTANT - TEXT MODE")
+        print("="*60)        
+        self.speak(f"Good day! I am {self.name}. Ready to assist you.")
+        print("\n" + "-"*60)
+        print("💡 Type 'help' to see available commands")
+        print("-"*60 + "\n")
+        while self.running:
+            try:
+                command = input("👤 You: ")
+                print()
+                if command:
+                    self.process_command(command)
+            except KeyboardInterrupt:
+                print("\n")
+                self.speak("Shutting down. Goodbye!")
+                self.running = False
+
+
+if __name__ == "__main__":
+    jarvis = SimpleJARVIS()
+    jarvis.run()
