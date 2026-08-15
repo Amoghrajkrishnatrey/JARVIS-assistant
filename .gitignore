@@ -1,0 +1,12 @@
+# Python environment & cache
+__pycache__/
+*.py[cod]
+venv/
+.env
+
+# Large & temporary files
+*.mp4
+~$*.docx
+.ipynb_checkpoints/
+*.sqlite
+*.duckdb
