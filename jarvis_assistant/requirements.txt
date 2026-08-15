@@ -1,0 +1,29 @@
+# --- Agent orchestration -----------------------------------------------
+langchain-core>=0.3
+langgraph>=0.2
+
+# --- LLM backends --------------------------------------------------------
+langchain-ollama>=0.2      # local backend (talks to a running `ollama serve`)
+langchain-anthropic>=0.3   # optional cloud fallback
+langchain-openai>=0.2      # optional cloud fallback (alternative to Anthropic)
+
+# --- Data engine -----------------------------------------------------------
+duckdb>=1.0
+pandas>=2.2
+polars>=1.0
+numpy>=1.26
+scikit-learn>=1.4
+matplotlib>=3.8
+seaborn>=0.13
+
+# --- RAG / data dictionary -------------------------------------------------
+chromadb>=0.5
+sentence-transformers>=3.0
+
+# --- Voice, config, misc ---------------------------------------------------
+pyttsx3>=2.90
+python-dotenv>=1.0
+requests>=2.31
+
+# --- Testing -----------------------------------------------------------
+pytest>=8.0
