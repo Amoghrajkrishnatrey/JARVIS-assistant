@@ -1,4 +1,0 @@
-Contract,PaymentMethod,MonthlyCharges,Churn
-One year,Credit Card,65.5,0
-Two year,Bank Transfer,80.0,0
-Month-to-month,Electronic Check,45.0,1

@@ -1,9 +1,0 @@
-pandas
-polars
-numpy
-scikit-learn
-duckdb
-matplotlib
-seaborn
-streamlit
-python-dotenv
